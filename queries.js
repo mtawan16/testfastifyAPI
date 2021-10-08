@@ -13,23 +13,45 @@ client.connect().then(()=>{
     console.log(error)
 })
 
+const getUser = async (request, response) => {
+    var data = await client.query("SELECT * FROM datarcp");
+    response.send(data['rows'])
+};
 
 const createUser = (request, response) => {
-    const {id, name, age, email } = request.body;
+    const config = request.body;
+    // console.log(config)
+    // console.log(config.config)
     client.query(
-        "INSERT INTO test (id, name, age, email) VALUES ($1, $2, $3)",
-        [ name, age, email], (error, result) => {
+        "INSERT INTO datarcp(config) VALUES($1)", [ config.config ], 
+        (error, result) => {
             if (error) {
                 throw error;
             }
             response.status(200).send({
-                "id": id,
-                "name": name,
-                "age": age,
-                "email": email
+                "config": config,
             });
         }
     );
+    response.send(config)
 };
 
-module.exports={createUser};
+const deleteUser = (request, response) => {
+    const config = request.body;
+    // console.log(config)
+    // console.log(config.config)
+    client.query(
+        `DELETE FROM datarcp WHERE config='${config.config}'`, 
+        (error, result) => {
+            if (error) {
+                throw error;
+            }
+            response.status(200).send({
+                "config": config,
+            });
+        }
+    );
+    response.send(config)
+};
+
+module.exports={createUser,deleteUser,getUser};
